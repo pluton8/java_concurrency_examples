@@ -7,31 +7,22 @@
 public class e0_nosynchronization {
     static class Worker implements Runnable {
         private final int id;
+        private final char payload;
 
-        Worker(int id) {
+        Worker(int id, char payload) {
             this.id = id;
+            this.payload = payload;
         }
 
         @Override
         public void run() {
             for (int i = 0; i < 1000; ++i) {
-                doJob(id);
+                doJob(payload);
             }
         }
     }
 
-    public static void doJob(int id) {
-        char c = '\0';
-        switch (id) {
-            case 0:
-                c = '.';
-                break;
-
-            case 1:
-                c = '$';
-                break;
-        }
-
+    public static void doJob(char c) {
         System.out.print(c);
         System.out.flush();
     }
@@ -39,8 +30,8 @@ public class e0_nosynchronization {
     public static void main(String[] args) throws InterruptedException {
         long start = System.currentTimeMillis();
 
-        Thread t0 = new Thread(new Worker(0), "Worker0");
-        Thread t1 = new Thread(new Worker(1), "Worker1");
+        Thread t0 = new Thread(new Worker(0, '.'), "Worker0");
+        Thread t1 = new Thread(new Worker(1, '$'), "Worker1");
 
         t0.start();
         t1.start();

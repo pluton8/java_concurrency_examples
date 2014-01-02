@@ -12,9 +12,11 @@ public class e1_fullblocksynchronization {
     static class Worker implements Runnable {
         private final int id;
         private final Object LOCK;
+        private final char payload;
 
-        Worker(int id, Object lock) {
+        Worker(int id, char payload, Object lock) {
             this.id = id;
+            this.payload = payload;
             this.LOCK = lock;
         }
 
@@ -29,24 +31,13 @@ public class e1_fullblocksynchronization {
 
             synchronized (LOCK) {
                 for (int i = 0; i < 1000; ++i) {
-                    doJob(id);
+                    doJob(payload);
                 }
             }
         }
     }
 
-    public static void doJob(int id) {
-        char c = '\0';
-        switch (id) {
-            case 0:
-                c = '.';
-                break;
-
-            case 1:
-                c = '$';
-                break;
-        }
-
+    public static void doJob(char c) {
         System.out.print(c);
         System.out.flush();
     }
@@ -55,8 +46,8 @@ public class e1_fullblocksynchronization {
         long start = System.currentTimeMillis();
 
         final Object LOCK = new Object();
-        Thread t0 = new Thread(new Worker(0, LOCK), "Worker0");
-        Thread t1 = new Thread(new Worker(1, LOCK), "Worker1");
+        Thread t0 = new Thread(new Worker(0, '.', LOCK), "Worker0");
+        Thread t1 = new Thread(new Worker(1, '$', LOCK), "Worker1");
 
         t0.start();
         t1.start();
