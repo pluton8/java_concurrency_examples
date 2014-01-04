@@ -4,12 +4,12 @@
  * used on the same object to block when ready to do some work and unblock when
  * notified.
  *
- * Also, to give each thread a right to start first, every one sleeps for a
- * random amount of time (0…5 ms.) before start.
- *
  * Created by u on 2014-01-02.
  */
 public class e20_pingpongnotification {
+    static final int WORKERS_COUNT = 2;
+    static Integer turn = 0;
+
     static class Worker implements Runnable {
         private final int id;
         private final Object LOCK;
@@ -23,32 +23,35 @@ public class e20_pingpongnotification {
 
         @Override
         public void run() {
-            randomWait();
-
             for (int workPiece = 0; workPiece < 100; ++workPiece) {
                 // without synchronized() you'll get an
                 // IllegalMonitorStateException
                 synchronized (LOCK) {
                     try {
-                        LOCK.wait(10);
-                        for (int i = 0; i < 10; ++i) {
-                            doJob(payload);
+                        while (!isMyTurn()) {
+                            // to deal with "spurious wake-ups"
+                            LOCK.wait();
                         }
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
+
+                    for (int i = 0; i < 10; ++i) {
+                        doJob(payload);
+                    }
+
+                    nextTurn();
                     LOCK.notify();
                 }
             }
         }
 
-        private void randomWait() {
-            int delay = (int) (Math.random() * 5);
-            try {
-                Thread.sleep(delay);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+        private boolean isMyTurn() {
+            return turn == id;
+        }
+
+        private void nextTurn() {
+            turn = (turn + 1) % WORKERS_COUNT;
         }
     }
 
