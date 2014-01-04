@@ -6,7 +6,7 @@
  *
  * Created by u on 2014-01-02.
  */
-public class e20_pingpongnotification {
+public class e20_waitnotifymethods {
     static final int WORKERS_COUNT = 2;
     static Integer turn = 0;
 
